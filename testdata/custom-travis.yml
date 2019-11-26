@@ -1,0 +1,68 @@
+language: go
+
+services:
+  - docker
+
+branches:
+  only:
+    - test-old-keycloak
+
+stages:
+  - test
+
+before_install:
+  - docker pull jboss/keycloak:${KC}
+  - docker run -d -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=secret -e KEYCLOAK_IMPORT=/tmp/gocloak-realm.json -v "`pwd`/testdata/gocloak-realm${REALM:-}.json:/tmp/gocloak-realm.json" -p 8080:8080 --name keycloak jboss/keycloak:${KC:-latest}
+
+after_failure:
+  - docker ps
+  - docker logs keycloak
+
+script:
+  - go test -cover -race -coverprofile=coverage.txt -covermode=atomic
+
+jobs:
+  include:
+    - stage: test
+    - env:
+        - KC=8.0.0
+    - env:
+        - KC=7.0.1
+    - env:
+        - KC=6.0.1
+    - env:
+        - KC=5.0.0
+    - env:
+        - KC=4.8.3.Final
+    - env:
+        - KC=4.7.0.Final
+    - env:
+        - KC=4.6.0.Final
+        - REALM=-4.6.0
+    - env:
+        - KC=4.5.0.Final
+        - REALM=-4.6.0
+    # - env:
+    #     - KC=4.4.0.Final
+    #     - REALM=-4.6.0
+    # - env:
+    #     - KC=4.3.0.Final
+    #     - REALM=-4.6.0
+    # - env:
+    #     - KC=4.2.1.Final
+    #     - REALM=-4.6.0
+    # - env:
+    #     - KC=4.1.0.Final
+    #     - REALM=-4.6.0
+    # - env:
+    #     - KC=4.0.0.Final
+    #     - REALM=-4.6.0
+    # - env:
+    #     - KC=3.4.3.Final
+    #     - REALM=-4.6.0
+    # - env:
+    #     - KC=2.5.5.Final
+    #     - REALM=-4.6.0
+    # - env:
+    #     - KC=1.9.8.Final
+    #     - REALM=-4.6.0
