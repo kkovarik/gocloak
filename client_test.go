@@ -506,7 +506,7 @@ func TestGocloak_LoginClient_UnknownRealm(t *testing.T) {
 		cfg.GoCloak.ClientSecret,
 		"ThisRealmDoesNotExist")
 	assert.Error(t, err, "Login shouldn't be successful")
-	assert.EqualError(t, err, "404 Not Found: Realm does not exist")
+	assert.Contains(t, err.Error(), "404 Not Found")
 }
 
 func TestGocloak_GetIssuer(t *testing.T) {
