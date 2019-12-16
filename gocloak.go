@@ -97,6 +97,10 @@ type GoCloak interface {
 	GetClientScope(token string, realm string, scopeID string) (*ClientScope, error)
 	// GetClientScopes returns all client scopes
 	GetClientScopes(token string, realm string) ([]*ClientScope, error)
+	// GetClientScopeMappingClientRoles does return list of clients roles in specific Client Scope mapping
+	GetClientScopeMappingClientRoles(token string, realm string, scopeID string, clientID string) ([]*Role, error)
+	// AddClientScopeMappingClientRole does add clients roles to specific Client Scope mapping
+	AddClientScopeMappingClientRoles(token string, realm string, scopeID string, clientID string, roles []*Role) error
 	// GetClientSecret returns a client's secret
 	GetClientSecret(token string, realm string, clientID string) (*CredentialRepresentation, error)
 	// GetClientServiceAccount retrieves the service account "user" for a client if enabled

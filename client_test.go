@@ -985,6 +985,70 @@ func TestGocloak_GetClientScopes(t *testing.T) {
 	assert.NotZero(t, len(scopes), "there should be client scopes")
 }
 
+func TestGocloak_GetClientScopeMappingClientRoles(t *testing.T) {
+	t.Parallel()
+	cfg := GetConfig(t)
+	client := NewClientWithDebug(t)
+	token := GetAdminToken(t, client)
+	tearDown, scopeID := CreateClientScope(t, client, nil)
+	defer tearDown()
+
+	// Getting client scope mapping roles
+	roles, err := client.GetClientScopeMappingClientRoles(
+		token.AccessToken,
+		cfg.GoCloak.Realm,
+		scopeID,
+		gocloakClientID)
+	assert.NoError(t, err, "GetClientScopes failed")
+	// Checking that GetClientScopes returns scopes
+	assert.NotZero(t, len(roles), "there should be client scopes")
+}
+
+func TestGocloak_AddClientScopeMappingClientRoles(t *testing.T) {
+	t.Parallel()
+	cfg := GetConfig(t)
+	client := NewClientWithDebug(t)
+	token := GetAdminToken(t, client)
+	tearDown, scopeID := CreateClientScope(t, client, nil)
+	defer tearDown()
+
+	roleName := GetRandomName("Role")
+	t.Logf("Creating Client Role: %s", roleName)
+	clientRoleID, err := client.CreateClientRole(
+		token.AccessToken,
+		cfg.GoCloak.Realm,
+		gocloakClientID,
+		Role{
+			Name: &roleName,
+		})
+	t.Logf("Created Client Role ID: %s", clientRoleID)
+
+	roles, err := client.GetClientRoles(
+		token.AccessToken,
+		cfg.GoCloak.Realm,
+		gocloakClientID)
+
+	// Getting client scope mapping roles
+	err = client.AddClientScopeMappingClientRoles(
+		token.AccessToken,
+		cfg.GoCloak.Realm,
+		scopeID,
+		gocloakClientID,
+		roles)
+	assert.NoError(t, err, "GetClientScopes failed")
+	// Checking that GetClientScopes returns scopes
+	assert.NotZero(t, len(roles), "there should be client scopes")
+
+	roles, err = client.GetClientScopeMappingClientRoles(
+		token.AccessToken,
+		cfg.GoCloak.Realm,
+		scopeID,
+		gocloakClientID)
+	assert.NoError(t, err, "GetClientScopes failed")
+	// Checking that GetClientScopes returns scopes
+	assert.NotZero(t, len(roles), "there should be client scopes")
+}
+
 func TestGocloak_CreateListGetUpdateDeleteClient(t *testing.T) {
 	t.Parallel()
 	cfg := GetConfig(t)

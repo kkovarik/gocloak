@@ -653,6 +653,32 @@ func (client *gocloak) GetClientScopes(token string, realm string) ([]*ClientSco
 	return result, nil
 }
 
+// Client Scopes -> Mappings -> Get client roles
+// GET /<realm>/client-scopes/59b43ffb-f179-4302-b607-4d2e8a0fa2d3/scope-mappings/clients/3ef54104-04d0-4b75-8a5b-ebdb9be27302
+func (client *gocloak) GetClientScopeMappingClientRoles(token string, realm string, scopeID string, clientID string) ([]*Role, error) {
+	var result []*Role
+
+	resp, err := client.getRequestWithBearerAuth(token).
+		SetResult(&result).
+		Get(client.getAdminRealmURL(realm, "client-scopes", scopeID, "scope-mappings", "clients", clientID))
+
+	if err := checkForError(resp, err); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Client Scopes -> Mappings -> Add client role
+// POST /<realm>/client-scopes/59b43ffb-f179-4302-b607-4d2e8a0fa2d3/scope-mappings/clients/3ef54104-04d0-4b75-8a5b-ebdb9be27302
+func (client *gocloak) AddClientScopeMappingClientRoles(token string, realm string, scopeID string, clientID string, roles []*Role) error {
+	resp, err := client.getRequestWithBearerAuth(token).
+		SetBody(roles).
+		Post(client.getAdminRealmURL(realm, "client-scopes", scopeID, "scope-mappings", "clients", clientID))
+
+	return checkForError(resp, err)
+}
+
 // GetClientSecret returns a client's secret
 func (client *gocloak) GetClientSecret(token string, realm string, clientID string) (*CredentialRepresentation, error) {
 	var result CredentialRepresentation
