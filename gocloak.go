@@ -164,6 +164,8 @@ type GoCloak interface {
 
 	// AddClientRoleToUser adds a client role to the user
 	AddClientRoleToUser(token string, realm string, clientID string, userID string, roles []Role) error
+	// AddClientRoleToGroup adds a client role to the group
+	AddClientRoleToGroup(token string, realm string, clientID string, groupID string, roles []Role) error
 	// CreateClientRole creates a new role for a client
 	CreateClientRole(accessToken, realm, clientID string, role Role) (string, error)
 	// DeleteClientRole deletes the given role
